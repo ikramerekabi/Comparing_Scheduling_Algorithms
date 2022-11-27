@@ -1,110 +1,138 @@
 #include <iostream>
-#include <bits/stdc++.h>
+//#include <bits/stdc++.h>
 
-using namespace std; 
-extern int max_priority = 40; 
+using namespace std;
+//extern int max_priority = 40; 
 struct process {
-	string proc_id;
-	double arrival_time;
-	double burst_time;
-	int priority; 
-	string state; 
-	double time_quantum; 
-	double turnaround_time;
-	double waiting_time;
-	double response_time;
-	double submission_time;
-	double completion_time;
-		
+    string proc_id;
+    double arrival_time;
+    double burst_time;
+    int priority;
+    string state;
+    double time_quantum;
+    double turnaround_time;
+    double waiting_time;
+    double response_time;
+    double submission_time;
+    double completion_time;
+
 };
 struct algorithm_output {
-	double Avg_turnaround_time;
-	double Avg_waiting_time;
-	double Avg_response_time;
+    double Avg_turnaround_time;
+    double Avg_waiting_time;
+    double Avg_response_time;
 
 };
-void swap(int* a, int* b) {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
-}
-void arrangeArrival(int num, int *mat[][3]) {
-    for (int i = 0; i < num; i++) {
-        for (int j = 0; j < num - i - 1; j++) {
-            if (mat[1][j] > mat[1][j + 1]) {
-                for (int k = 0; k < 5; k++) {
-                    swap(mat[k][j], mat[k][j + 1]);
-                }
-            }
-        }
+
+void findWaitingTime(process processes[], int n)
+{
+    // waiting time for first process is 0
+   // wt[0] = 0;
+    processes[0].waiting_time = 0;
+
+    // calculating waiting time
+    for (int i = 1; i < n; i++)
+    {
+        processes[i].waiting_time = processes[i - 1].burst_time + processes[i - 1].waiting_time;
     }
+
 }
-void completionTime(int num, int mat[][3]) {
-    int temp, val;
-    mat[3][0] = mat[1][0] + mat[2][0];
-    mat[5][0] = mat[3][0] - mat[1][0];
-    mat[4][0] = mat[5][0] - mat[2][0];
-    for (int i = 1; i < num; i++) {
-        temp = mat[3][i - 1];
-        int low = mat[2][i];
-        for (int j = i; j < num; j++) {
-            if (temp >= mat[1][j] && low >= mat[2][j]) {
-                low = mat[2][j];
-                val = j;
-            }
-        }
-        mat[3][val] = temp + mat[2][val];
-        mat[5][val] = mat[3][val] - mat[1][val];
-        mat[4][val] = mat[5][val] - mat[2][val];
-        for (int k = 0; k < 6; k++) {
-            swap(mat[k][val], mat[k][i]);
-        }
+
+// Function to calculate turn around time
+void findTurnAroundTime(process processes[], int n)
+//  int processes[], int n,int bt[], int wt[], int tat[])
+{
+    // calculating turnaround time by adding
+    // bt[i] + wt[i]
+    for (int i = 0; i < n; i++)
+    {
+        processes[i].turnaround_time = processes[i].burst_time + processes[i].waiting_time;
     }
+    // tat[i] = bt[i] + wt[i];
 }
-algorithm_output Non_preemptive_SJF(struct process *processes, int num_proc )
+
+//Function to calculate average time
+double findavgTime(process processes[], int n)
+
 {
     
+    double Average_Waiting_Time;
+    double total_waiting_time = 0;
+   
+    findWaitingTime(processes, n);
     
-    
-        int num = 3, temp;
-        //int mat[6][3] = { 1, 2, 3, 3, 6, 4, 2, 3, 4 };
-        /*..cout << "Before Arrange...
-            ";
-            cout << "Process ID\tArrival Time\tBurst Time
-            ";
-            for (int i = 0; i < num; i++) {
-                cout << mat[0][i] << "\t\t" << mat[1][i] << "\t\t" << mat[2][i] << "
-                    ";
-            }*/
-        arrangeArrival(num, processes);
-        completionTime(num, mat);
-        cout << "Final Result...
-            ";
-            cout << "Process ID\tArrival Time\tBurst Time\tWaiting Time\tTurnaround Time
-            ";
-            for (int i = 0; i < num; i++) {
-                cout << mat[0][i] << "\t\t" << mat[1][i] << "\t\t" << mat[2][i] << "\t\t" << mat[4][i] << "\t\t" << mat[5][i] << "
-                    ";
-            }
+    for (int i = 0; i < n; i++)
+    {
+        total_waiting_time = total_waiting_time + processes[i].waiting_time;
+        
     }
-
-
+    Average_Waiting_Time = total_waiting_time / n;
+    
+    return Average_Waiting_Time;
 }
 
+double findavgTurnaroundTime(process processes[], int n)
+{
+    double Average_Turnaround_Time;
+    double total_turnaround_time = 0;
+    findTurnAroundTime(processes, n);
+    for (int i = 0; i < n; i++)
+    {
+       total_turnaround_time = total_turnaround_time + processes[i].turnaround_time;
+    }
+    Average_Turnaround_Time = total_turnaround_time / n;
+    return Average_Turnaround_Time;
+}
 
+algorithm_output FCFS(process processes[], int n)
+{
+    struct algorithm_output output;
+    //process id's
+    // int processes[] = { 1, 2, 3};
+    //int n = sizeof processes / sizeof processes[0];
 
-//Preemptive Shortest Job First(becomes Shortest Remaining Time First, SRTF)
-//Round Robin(RR)
-//First Come First Served(FCFS)
-//Multilevel Feedback Queue(MLFQ)
+    //Burst time of all processes
+   // int  burst_time[] = {10, 5, 8};
 
-
-
+    output.Avg_waiting_time = findavgTime(processes, n);
+    output.Avg_turnaround_time = findavgTurnaroundTime(processes, n);
+    return output;
+}
 int main()
 {
+    int n;
+    cout << "Enter the number of processes\n";
+    cin >> n;
+    process *processes_input= new process[n];
+    algorithm_output alg_out;
+    for (int i = 0; i < n; i++)
+    {
+        //cout<<"enter the process id\n";
+        //cin>>processes_input[i].proc_id; 
+        processes_input[i].proc_id = i;
+
+        cout << "enter the process burst time \n";
+        cin >> processes_input[i].burst_time;
+        cout << "enter the ";
+    }
+
+    alg_out = FCFS(processes_input, n);
+    printf("\nProcess\t    Burst Time    \tWaiting Time\t\tTurnaround Time\n");
+    for (int i = 0; i < n; i++)
+    {
+        //processes_input[i].turnaround_time = processes_input[i].burst_time + processes_input[i].waiting_time;
+        //total += processes[i].turnaround_time;
+        cout << processes_input[i].proc_id << "\t\t" << processes_input[i].burst_time << "\t\t\t" << processes_input[i].waiting_time << "\t\t\t" << processes_input[i].turnaround_time << "\n";
+    }
+
+    
+   
+
+    cout << "the average waiting time is: \t" << alg_out.Avg_waiting_time<<endl;
+    cout << "the average turnaround time is: \t" << alg_out.Avg_turnaround_time;
 
 
-	return 0; 
+    return 0;
 }
 
 

@@ -371,7 +371,6 @@ int main()
     algorithm_output alg_out;
     processes_input=read_from_file();
     int size = sizeof(processes_input) / sizeof(processes_input[0]);
-    cout << processes_input[0].proc_id;
 
     alg_out = FCFS(processes_input, size);
     printf("\nProcess\t    Burst Time    \tWaiting Time\t\tTurnaround Time\t \t Response Time\n");

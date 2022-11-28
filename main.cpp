@@ -2,10 +2,20 @@
 
 
 #include <iostream>
+#include <fstream>
 //#include <bits/stdc++.h>
 
 using namespace std;
 //extern int max_priority = 40; 
+
+void write_to_file() {
+    
+    ofstream myfile;
+    myfile.open("example.csv");
+    myfile << "a,b,c,\n";
+    myfile.close();
+
+}
 struct process {
     string proc_id;
     double arrival_time;

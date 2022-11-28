@@ -86,6 +86,104 @@ algorithm_output FCFS(process processes[], int n)
     output.Avg_response_time = output.Avg_waiting_time; 
     return output;
 }
+
+//Non-Preemptive SJF Scheduling
+algorithm_output Non_preemptive_SJF(struct process* processes, int num_proc)
+{
+    float avg_wt, avg_tat, avg_rt, avg_rp;
+    int total = 0, pos, temp;
+    int  time = 0;
+    int sum_burst_time = 0;
+    vector<process> ready_processes;
+    vector<process> running_processes;
+    vector<process> total_processes;
+    for (int i = 0; i < num_proc; i++)
+    {
+        sum_burst_time += processes[i].burst_time;
+    }
+
+    for (int i = 0; i < num_proc; i++)
+    {
+        total_processes.push_back(processes[i]);
+    }
+
+    for (time; time < sum_burst_time;)
+    {
+        for (int z = 0; z < total_processes.size(); z++) {
+            if (total_processes[z].arrival_time <= time) {
+                ready_processes.push_back(total_processes[z]);
+                total_processes.erase(total_processes.begin() + z);
+            }
+        }
+        int min = 9999;
+        int running = 0;
+        for (int j = 0; j < ready_processes.size(); j++)
+        {
+            if (ready_processes[j].burst_time < min)
+            {
+                min = ready_processes[j].burst_time;
+                running = j;
+            }
+
+        }
+        running_processes.push_back(ready_processes[running]);
+        time += ready_processes[running].burst_time;
+        ready_processes.erase(ready_processes.begin() + running);
+
+
+    }
+
+    running_processes[0].waiting_time = 0;
+    for (int i = 1; i < running_processes.size(); i++)
+    {
+        running_processes[i].waiting_time = 0;
+        for (int j = 0; j < i; j++) {
+            running_processes[i].waiting_time += running_processes[j].burst_time;
+        }
+        running_processes[i].waiting_time -= running_processes[i].arrival_time;
+        total += running_processes[i].waiting_time;
+    }
+
+    avg_wt = (float)total / num_proc;
+    total = 0;
+
+    for (int i = 0; i < running_processes.size(); i++)
+    {
+        running_processes[i].response_time = 0;
+        for (int j = 0; j < i; j++) {
+            running_processes[i].response_time += running_processes[j].burst_time;
+        }
+        running_processes[i].response_time -= running_processes[i].arrival_time;
+        total += running_processes[i].response_time;
+    }
+
+    avg_rt = (float)total / num_proc;
+    total = 0;
+
+    for (int i = 0; i < running_processes.size(); i++)
+    {
+        running_processes[i].turnaround_time = 0;
+        for (int j = 0; j < i; j++) {
+            running_processes[i].turnaround_time += running_processes[j].burst_time;
+        }
+        running_processes[i].turnaround_time += running_processes[i].burst_time;
+        total += running_processes[i].turnaround_time;
+    }
+    avg_tat = (float)total / num_proc;
+
+
+    struct algorithm_output output;
+    output.Avg_waiting_time = avg_wt;
+    output.Avg_turnaround_time = avg_tat;
+    output.Avg_response_time = avg_rt;
+    //cout<<"Non Preemptive SJF"<<endl;
+    //printf("\nProcess\t    Arrival Time\t    Burst Time    \tWaiting Time\t\tTurnaround Time\t\tResponse Time\n");
+    //for (int i = 0; i < running_processes.size(); i++) {
+    //    cout << running_processes[i].proc_id << "\t\t" << running_processes[i].arrival_time << "\t\t\t" << running_processes[i].burst_time << "\t\t\t" << running_processes[i].waiting_time << "\t\t\t" << running_processes[i].turnaround_time << "\t\t\t" << running_processes[i].response_time << "\n";
+    //}
+
+    return output;
+}
 int main()
 {
     int n;

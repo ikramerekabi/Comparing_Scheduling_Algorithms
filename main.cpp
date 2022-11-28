@@ -50,9 +50,10 @@ process* read_from_file() {
     {
         Processes[j - 1].proc_id = stoi(content[j][0]);
         Processes[j - 1].arrival_time = stoi(content[j][1]);
-        Processes[j - 1].burst_time = stoi(content[j][1]);
+        Processes[j - 1].burst_time = stoi(content[j][2]);
     }
     cout << "\n";
+    cout << Processes[0].proc_id;
     return Processes;
 }
 
@@ -370,16 +371,7 @@ int main()
     algorithm_output alg_out;
     processes_input=read_from_file();
     int size = sizeof(processes_input) / sizeof(processes_input[0]);
-    for (int i = 0; i < size; i++)
-    {
-        //cout<<"enter the process id\n";
-        //cin>>processes_input[i].proc_id; 
-        processes_input[i].proc_id = i;
-
-        cout << "enter the process burst time \n";
-        cin >> processes_input[i].burst_time;
-        cout << "enter the ";
-    }
+    cout << processes_input[0].proc_id;
 
     alg_out = FCFS(processes_input, size);
     printf("\nProcess\t    Burst Time    \tWaiting Time\t\tTurnaround Time\t \t Response Time\n");

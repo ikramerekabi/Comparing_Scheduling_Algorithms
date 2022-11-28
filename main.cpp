@@ -86,7 +86,7 @@ algorithm_output round_roubin(struct process* process, int n) {
     int total_response_time = 0;
     int total_idle_time = 0;
     float throughput;
-    int* burst_remaining= new int[n];
+    int* burst_remaining = new int[n];
     int eligibal_proc;
     int current_time = 0;
     int completed = 0;
@@ -368,11 +368,14 @@ algorithm_output Preemptive_SJF(struct process* processes, int num_proc) {
 int main()
 {
     process* processes_input;
-    algorithm_output alg_out;
-    processes_input=read_from_file();
+    algorithm_output alg_out1, alg_out2, alg_out3, alg_out4;
+    processes_input = read_from_file();
     int size = sizeof(processes_input) / sizeof(processes_input[0]);
 
-    alg_out = FCFS(processes_input, size);
+    alg_out1 = FCFS(processes_input, size);
+    alg_out2 = Preemptive_SJF(processes_input, size);
+    alg_out3 = Non_preemptive_SJF(processes_input, size);
+    alg_out4 = round_roubin(processes_input, size);
     printf("\nProcess\t    Burst Time    \tWaiting Time\t\tTurnaround Time\t \t Response Time\n");
     for (int i = 0; i < size; i++)
     {
@@ -384,16 +387,30 @@ int main()
 
 
 
-    cout << "the average waiting time is: \t" << alg_out.Avg_waiting_time << endl;
-    cout << "the average turnaround time is: \t" << alg_out.Avg_turnaround_time << endl;
-    cout << "the average tutime is: \t" << alg_out.Avg_turnaround_time << endl;
+    cout << "the average waiting time for the FCFS algorithm is: \t" << alg_out1.Avg_waiting_time << endl;
+    cout << "the average turnaround time for the FCFS algorithm is: \t" << alg_out1.Avg_turnaround_time << endl;
+    cout << "the average tutime for the FCFS algorithm is: \t" << alg_out1.Avg_turnaround_time << endl;
+
+
+    cout << "the average waiting time for the Preemptive_SJF algorithm is: \t" << alg_out2.Avg_waiting_time << endl;
+    cout << "the average turnaround time for the Preemptive_SJF algorithm is: \t" << alg_out2.Avg_turnaround_time << endl;
+    cout << "the average tutime for the Preemptive_SJF algorithm is: \t" << alg_out2.Avg_turnaround_time << endl;
+
+    cout << "the average waiting time for the Non_preemptive_SJF algorithm is: \t" << alg_out3.Avg_waiting_time << endl;
+    cout << "the average turnaround time for the Non_preemptive_SJF algorithm is: \t" << alg_out3.Avg_turnaround_time << endl;
+    cout << "the average tutime for the Non_preemptive_SJF algorithm is: \t" << alg_out3.Avg_turnaround_time << endl;
+
+    cout << "the average waiting time for the round_roubin algorithm is: \t" << alg_out4.Avg_waiting_time << endl;
+    cout << "the average turnaround time for the round_roubin algorithm is: \t" << alg_out4.Avg_turnaround_time << endl;
+    cout << "the average tutime for the round_roubin algorithm is: \t" << alg_out4.Avg_turnaround_time << endl;
+
+
+
+
+
+
 
 
 
     return 0;
 }
-
-
-
-
-

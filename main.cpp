@@ -2,22 +2,21 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <queue>
 //#include <bits/stdc++.h>
 
 using namespace std;
 //extern int max_priority = 40; 
 struct process {
     int proc_id;
-    double arrival_time;
-    double burst_time;
-    int priority;
-    string state;
-    double time_quantum;
-    double turnaround_time;
-    double waiting_time;
-    double response_time;
-    double submission_time;
-    double completion_time;
+    int arrival_time;
+    int burst_time;
+    int start_time;
+    int completion_time;
+    int turnaround_time;
+    int waiting_time;
+    int response_time;
+
 
 };
 process* read_from_file() {
@@ -63,7 +62,103 @@ struct algorithm_output {
     double Avg_response_time;
 
 };
+bool comparator1(process p1, process p2)
+{
+    return p1.arrival_time < p2.arrival_time;
+}
 
+bool comparator2(process p1, process p2)
+{
+    return p1.proc_id < p2.proc_id;
+}
+
+algorithm_output round_roubin(struct process* process, int n) {
+    struct algorithm_output output;
+    int time_quantum = 2;  //
+    struct process arr[100];
+    float avg_turnaround_time;
+    float avg_waiting_time;
+    float avg_response_time;
+    float cpu_utilisation;
+    int total_turnaround_time = 0;
+    int total_waiting_time = 0;
+    int total_response_time = 0;
+    int total_idle_time = 0;
+    float throughput;
+    int* burst_remaining= new int[n];
+    int eligibal_proc;
+    int current_time = 0;
+    int completed = 0;
+    int mark[100];
+    mark[0] = 1;
+
+    queue<int> q;
+    sort(arr, arr + n, comparator1);  // sort based on the arriving time.
+    memset(mark, 0, sizeof(mark)); // set all processs to uncomplete
+
+
+    q.push(0);
+
+    while (completed != n) {
+        eligibal_proc = q.front();
+        q.pop();
+
+        if (burst_remaining[eligibal_proc] == arr[eligibal_proc].burst_time) {
+            arr[eligibal_proc].start_time = max(current_time, arr[eligibal_proc].arrival_time);
+            current_time = arr[eligibal_proc].start_time;
+        }
+
+        if (burst_remaining[eligibal_proc] - time_quantum > 0) {
+            burst_remaining[eligibal_proc] -= time_quantum;
+            current_time += time_quantum;
+        }
+        else {
+            current_time += burst_remaining[eligibal_proc];
+            burst_remaining[eligibal_proc] = 0;
+            completed++;
+
+            arr[eligibal_proc].completion_time = current_time;
+            arr[eligibal_proc].turnaround_time = arr[eligibal_proc].completion_time - arr[eligibal_proc].arrival_time;
+            arr[eligibal_proc].waiting_time = arr[eligibal_proc].turnaround_time - arr[eligibal_proc].burst_time;
+            arr[eligibal_proc].response_time = arr[eligibal_proc].start_time - arr[eligibal_proc].arrival_time;
+
+            total_turnaround_time += arr[eligibal_proc].turnaround_time;
+            total_waiting_time += arr[eligibal_proc].waiting_time;
+            total_response_time += arr[eligibal_proc].response_time;
+        }
+
+        for (int i = 1; i < n; i++) {
+            if (burst_remaining[i] > 0 && arr[i].arrival_time <= current_time && mark[i] == 0) {
+                q.push(i);
+                mark[i] = 1;
+            }
+        }
+        if (burst_remaining[eligibal_proc] > 0) {
+            q.push(eligibal_proc);
+        }
+
+        if (q.empty()) {
+            for (int i = 1; i < n; i++) {
+                if (burst_remaining[i] > 0) {
+                    q.push(i);
+                    mark[i] = 1;
+                    break;
+                }
+            }
+        }
+
+
+    }
+
+    avg_turnaround_time = (float)total_turnaround_time / n;
+    avg_waiting_time = (float)total_waiting_time / n;
+    avg_response_time = (float)total_response_time / n;
+
+    output.Avg_waiting_time = avg_waiting_time;
+    output.Avg_turnaround_time = avg_turnaround_time;
+    output.Avg_response_time = avg_response_time;
+    return output;
+}
 void findWaitingTime_FCFS(process processes[], int n)
 {
 

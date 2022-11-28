@@ -1,23 +1,13 @@
-
-
-
+#include <vector>
+#include <sstream>
 #include <iostream>
 #include <fstream>
 //#include <bits/stdc++.h>
 
 using namespace std;
 //extern int max_priority = 40; 
-
-void write_to_file() {
-    
-    ofstream myfile;
-    myfile.open("example.csv");
-    myfile << "a,b,c,\n";
-    myfile.close();
-
-}
 struct process {
-    string proc_id;
+    int proc_id;
     double arrival_time;
     double burst_time;
     int priority;
@@ -30,6 +20,43 @@ struct process {
     double completion_time;
 
 };
+process* read_from_file() {
+    string fname;
+    cout << "Enter the file name: ";
+    cin >> fname;
+    cout << endl;
+    vector<vector<string>> content;
+    vector<string> row;
+    string line, word;
+
+    fstream file(fname, ios::in);
+    if (file.is_open())
+    {
+        while (getline(file, line))
+        {
+            row.clear();
+
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+                row.push_back(word);
+            content.push_back(row);
+        }
+    }
+    process* Processes = new process[content.size() - 1];
+    for (int i = 0; i < content.size(); i++)
+    {
+    }
+    for (int j = 1; j < content.size(); j++)
+    {
+        Processes[j - 1].proc_id = stoi(content[j][0]);
+        Processes[j - 1].arrival_time = stoi(content[j][1]);
+        Processes[j - 1].burst_time = stoi(content[j][1]);
+    }
+    cout << "\n";
+    return Processes;
+}
+
 struct algorithm_output {
     double Avg_turnaround_time;
     double Avg_waiting_time;
@@ -239,104 +266,16 @@ algorithm_output Preemptive_SJF(struct process* processes, int num_proc) {
     return output;
 }
 
-algorithm_output round_roubin(struct process* process , int n){
-   
-    int n;  // fix it mmba3d
-    int time_quantum = 2;  //
-    struct process arr[100];
-    float avg_turnaround_time;
-    float avg_waiting_time;
-    float avg_response_time;
-    float cpu_utilisation;
-    int total_turnaround_time = 0;
-    int total_waiting_time = 0;
-    int total_response_time = 0;
-    int total_idle_time = 0;
-    float throughput;
-    int burst_remaining[n];
-    int eligibal_proc;
-    int current_time = 0;
-    int completed = 0;
-    int mark[100];
-    mark[0] = 1;
-
-    queue<int> q;
-    sort(arr,arr+n,comparator1);  // sort based on the arriving time.
-    memset(mark,0,sizeof(mark)); // set all processs to uncomplete
-    
-    
-    q.push(0);
-
-    while(completed != n) {
-        eligibal_proc = q.front();
-        q.pop();
-
-        if(burst_remaining[eligibal_proc] == arr[eligibal_proc].burst_time) {
-            arr[eligibal_proc].start_time = max(current_time,arr[eligibal_proc].arrival_time);
-            current_time = arr[eligibal_proc].start_time;
-        }
-
-        if(burst_remaining[eligibal_proc]-time_quantum > 0) {
-            burst_remaining[eligibal_proc] -= time_quantum;
-            current_time += time_quantum;
-        }
-        else {
-            current_time += burst_remaining[eligibal_proc];
-            burst_remaining[eligibal_proc] = 0;
-            completed++;
-
-            arr[eligibal_proc].completion_time = current_time;
-            arr[eligibal_proc].turnaround_time = arr[eligibal_proc].completion_time - arr[eligibal_proc].arrival_time;
-            arr[eligibal_proc].waiting_time = arr[eligibal_proc].turnaround_time - arr[eligibal_proc].burst_time;
-            arr[eligibal_proc].response_time = arr[eligibal_proc].start_time - arr[eligibal_proc].arrival_time;
-
-            total_turnaround_time += arr[eligibal_proc].turnaround_time;
-            total_waiting_time += arr[eligibal_proc].waiting_time;
-            total_response_time += arr[eligibal_proc].response_time;
-        }
-
-        for(int i = 1; i < n; i++) {
-            if(burst_remaining[i] > 0 && arr[i].arrival_time <= current_time && mark[i] == 0) {
-                q.push(i);
-                mark[i] = 1;
-            }
-        }
-        if(burst_remaining[eligibal_proc] > 0) {
-            q.push(eligibal_proc);
-        }
-
-        if(q.empty()) {
-            for(int i = 1; i < n; i++) {
-                if(burst_remaining[i] > 0) {
-                    q.push(i);
-                    mark[i] = 1;
-                    break;
-                }
-            }
-        }
-
-
-    }
-
-    avg_turnaround_time = (float) total_turnaround_time / n;
-    avg_waiting_time = (float) total_waiting_time / n;
-    avg_response_time = (float) total_response_time / n;
-
-   
-    return output;
-}
-
 
 
 
 int main()
 {
-    int n;
-    cout << "Enter the number of processes\n";
-    cin >> n;
-    process* processes_input = new process[n];
+    process* processes_input;
     algorithm_output alg_out;
-    for (int i = 0; i < n; i++)
+    processes_input=read_from_file();
+    int size = sizeof(processes_input) / sizeof(processes_input[0]);
+    for (int i = 0; i < size; i++)
     {
         //cout<<"enter the process id\n";
         //cin>>processes_input[i].proc_id; 
@@ -347,9 +286,9 @@ int main()
         cout << "enter the ";
     }
 
-    alg_out = FCFS(processes_input, n);
+    alg_out = FCFS(processes_input, size);
     printf("\nProcess\t    Burst Time    \tWaiting Time\t\tTurnaround Time\t \t Response Time\n");
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < size; i++)
     {
         //processes_input[i].turnaround_time = processes_input[i].burst_time + processes_input[i].waiting_time;
         //total += processes[i].turnaround_time;

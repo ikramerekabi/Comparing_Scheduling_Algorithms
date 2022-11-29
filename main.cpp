@@ -410,48 +410,63 @@ algorithm_output Preemptive_SJF(struct process* processes, int num_proc) {
 
 int main()
 {
-   process_total processes_input;
+    
+    process_total processes_input;
     algorithm_output alg_out1, alg_out2, alg_out3, alg_out4;
     processes_input = read_from_file();
     int size = processes_input.N;
+    
+        alg_out1 = FCFS(processes_input.processes, size);
+        alg_out2 = Preemptive_SJF(processes_input.processes, size);
+        alg_out3 = Non_preemptive_SJF(processes_input.processes, size);
+        alg_out4 = round_roubin(processes_input.processes, size);
 
-    alg_out1 = FCFS(processes_input.processes, size);
-    alg_out2 = Preemptive_SJF(processes_input.processes, size);
-    alg_out3 = Non_preemptive_SJF(processes_input.processes, size);
-    alg_out4 = round_roubin(processes_input.processes, size);
-    //printf("\nProcess\t    Burst Time    \tWaiting Time\t\tTurnaround Time\t \t Response Time\n");
-    //for (int i = 0; i < size; i++)
-    //{
-        //processes_input[i].turnaround_time = processes_input[i].burst_time + processes_input[i].waiting_time;
-        //total += processes[i].turnaround_time;
-    //    cout << processes_input.processes[i].proc_id << "\t\t" << processes_input.processes[i].burst_time << "\t\t\t" << processes_input.processes[i].waiting_time << "\t\t\t" << processes_input.processes[i].waiting_time << "\t\t\t" << processes_input.processes[i].turnaround_time << "\n";
-    //}
+        fstream FCFS1;
 
-
-
-
-    cout << "the average waiting time for the FCFS algorithm is: \t" << alg_out1.Avg_waiting_time << endl;
-    cout << "the average turnaround time for the FCFS algorithm is: \t" << alg_out1.Avg_turnaround_time << endl;
-    cout << "the average response time for the FCFS algorithm is: \t" << alg_out1.Avg_response_time << endl;
+        
+        FCFS1.open("FCFS.csv", std::ios_base::app);
+        if (!FCFS1) {
+            cout << "File not created!";
+        }
+        else {
+            FCFS1 << alg_out1.Avg_waiting_time << "," << alg_out1.Avg_turnaround_time << "," << alg_out1.Avg_response_time <<",59,\n";
+            FCFS1.close();
+        }
 
 
-    cout << "the average waiting time for the Preemptive_SJF algorithm is: \t" << alg_out2.Avg_waiting_time << endl;
-    cout << "the average turnaround time for the Preemptive_SJF algorithm is: \t" << alg_out2.Avg_turnaround_time << endl;
-    cout << "the average response time for the Preemptive_SJF algorithm is: \t" << alg_out2.Avg_response_time << endl;
+        fstream PreemptiveSJF;
+        PreemptiveSJF.open("PreemptiveSJF.csv", std::ios_base::app);
+        if (!PreemptiveSJF) {
+            cout << "File not created!";
+        }
+        else {
+            PreemptiveSJF << alg_out2.Avg_waiting_time << "," << alg_out2.Avg_turnaround_time << "," << alg_out2.Avg_response_time << ",59,\n";
+            PreemptiveSJF.close();
+        }
+            
 
-    cout << "the average waiting time for the Non_preemptive_SJF algorithm is: \t" << alg_out3.Avg_waiting_time << endl;
-    cout << "the average turnaround time for the Non_preemptive_SJF algorithm is: \t" << alg_out3.Avg_turnaround_time << endl;
-    cout << "the average response time for the Non_preemptive_SJF algorithm is: \t" << alg_out3.Avg_response_time << endl;
+        fstream NonPreemptiveSJF;
+        NonPreemptiveSJF.open("NonPreemptiveSJF.csv", std::ios_base::app);
+        if (!NonPreemptiveSJF) {
+            cout << "File not created!";
+        }
+        else {
+            NonPreemptiveSJF << alg_out3.Avg_waiting_time << "," << alg_out3.Avg_turnaround_time << "," << alg_out3.Avg_response_time << ",59,\n";
+            NonPreemptiveSJF.close();
+        }
 
-    cout << "the average waiting time for the round_roubin algorithm is: \t" << alg_out4.Avg_waiting_time << endl;
-    cout << "the average turnaround time for the round_roubin algorithm is: \t" << alg_out4.Avg_turnaround_time << endl;
-    cout << "the average response time for the round_roubin algorithm is: \t" << alg_out4.Avg_waiting_time << endl;
+        fstream roundroubin;
+        roundroubin.open("roundroubin.csv", std::ios_base::app);
+        if (!roundroubin) {
+            cout << "File not created!";
+        }
+        else {
+            roundroubin << alg_out4.Avg_waiting_time << "," << alg_out4.Avg_turnaround_time << "," << alg_out4.Avg_response_time << ",59,\n";
+            roundroubin.close();
+        }
 
-
-
-
-
-    return 0;
+        return 0;
+    
 }
 
 

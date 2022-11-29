@@ -79,8 +79,7 @@ bool comparator2(process p1, process p2)
 
 algorithm_output round_roubin(struct process* process, int n) {
     struct algorithm_output output;
-    int time_quantum = 2;  //
-    struct process arr[100];
+    int time_quantum = 2;  
     float avg_turnaround_time;
     float avg_waiting_time;
     float avg_response_time;
@@ -96,9 +95,11 @@ algorithm_output round_roubin(struct process* process, int n) {
     int completed = 0;
     int mark[100];
     mark[0] = 1;
-
+        for(int i = 0; i < n; i++) {
+        burst_remaining[i] = process[i].burst_time;
+        }
     queue<int> q;
-    sort(arr, arr + n, comparator1);  // sort based on the arriving time.
+    sort(process, process + n, comparator1);  // sort based on the arriving time.
     memset(mark, 0, sizeof(mark)); // set all processs to uncomplete
 
 
@@ -108,9 +109,9 @@ algorithm_output round_roubin(struct process* process, int n) {
         eligibal_proc = q.front();
         q.pop();
 
-        if (burst_remaining[eligibal_proc] == arr[eligibal_proc].burst_time) {
-            arr[eligibal_proc].start_time = max(current_time, arr[eligibal_proc].arrival_time);
-            current_time = arr[eligibal_proc].start_time;
+        if (burst_remaining[eligibal_proc] == process[eligibal_proc].burst_time) {
+            process[eligibal_proc].start_time = max(current_time, process[eligibal_proc].arrival_time);
+            current_time = process[eligibal_proc].start_time;
         }
 
         if (burst_remaining[eligibal_proc] - time_quantum > 0) {
@@ -122,18 +123,18 @@ algorithm_output round_roubin(struct process* process, int n) {
             burst_remaining[eligibal_proc] = 0;
             completed++;
 
-            arr[eligibal_proc].completion_time = current_time;
-            arr[eligibal_proc].turnaround_time = arr[eligibal_proc].completion_time - arr[eligibal_proc].arrival_time;
-            arr[eligibal_proc].waiting_time = arr[eligibal_proc].turnaround_time - arr[eligibal_proc].burst_time;
-            arr[eligibal_proc].response_time = arr[eligibal_proc].start_time - arr[eligibal_proc].arrival_time;
+            process[eligibal_proc].completion_time = current_time;
+            process[eligibal_proc].turnaround_time = process[eligibal_proc].completion_time - process[eligibal_proc].arrival_time;
+            process[eligibal_proc].waiting_time = process[eligibal_proc].turnaround_time - process[eligibal_proc].burst_time;
+            process[eligibal_proc].response_time = process[eligibal_proc].start_time - process[eligibal_proc].arrival_time;
 
-            total_turnaround_time += arr[eligibal_proc].turnaround_time;
-            total_waiting_time += arr[eligibal_proc].waiting_time;
-            total_response_time += arr[eligibal_proc].response_time;
+            total_turnaround_time += process[eligibal_proc].turnaround_time;
+            total_waiting_time += process[eligibal_proc].waiting_time;
+            total_response_time += process[eligibal_proc].response_time;
         }
 
         for (int i = 1; i < n; i++) {
-            if (burst_remaining[i] > 0 && arr[i].arrival_time <= current_time && mark[i] == 0) {
+            if (burst_remaining[i] > 0 && process[i].arrival_time <= current_time && mark[i] == 0) {
                 q.push(i);
                 mark[i] = 1;
             }
@@ -164,6 +165,7 @@ algorithm_output round_roubin(struct process* process, int n) {
     output.Avg_response_time = avg_response_time;
     return output;
 }
+
 void findWaitingTime_FCFS(process processes[], int n)
 {
 
@@ -381,19 +383,19 @@ algorithm_output Preemptive_SJF(struct process* processes, int num_proc) {
     for (int i = 0; i < num_proc; i++)
         tat[i] = processes[i].burst_time + wt[i];
 
-    for (int i = 0; i < num_proc; i++) {
+   for (int i = 0; i < num_proc; i++) {
         total_wt = total_wt + wt[i];
         total_tat = total_tat + tat[i];
-        cout << " " << processes[i].proc_id << "\t\t"
-            << processes[i].burst_time << "\t\t " << wt[i]
-            << "\t\t " << tat[i] << endl;
+     //   cout << " " << processes[i].proc_id << "\t\t"
+     //       << processes[i].burst_time << "\t\t " << wt[i]
+     //       << "\t\t " << tat[i] << endl;
     }
-
+/*
     cout << "\nAverage waiting time = "
         << (float)total_wt / (float)num_proc;
     cout << "\nAverage turn around time = "
         << (float)total_tat / (float)num_proc;
-
+*/
 
     struct algorithm_output output;
     output.Avg_waiting_time = (float)total_wt / (float)num_proc;
@@ -416,34 +418,34 @@ int main()
     alg_out1 = FCFS(processes_input.processes, size);
     alg_out2 = Preemptive_SJF(processes_input.processes, size);
     alg_out3 = Non_preemptive_SJF(processes_input.processes, size);
-    //alg_out4 = round_roubin(processes_input.processes, size);
-    printf("\nProcess\t    Burst Time    \tWaiting Time\t\tTurnaround Time\t \t Response Time\n");
-    for (int i = 0; i < size; i++)
-    {
+    alg_out4 = round_roubin(processes_input.processes, size);
+    //printf("\nProcess\t    Burst Time    \tWaiting Time\t\tTurnaround Time\t \t Response Time\n");
+    //for (int i = 0; i < size; i++)
+    //{
         //processes_input[i].turnaround_time = processes_input[i].burst_time + processes_input[i].waiting_time;
         //total += processes[i].turnaround_time;
-        cout << processes_input.processes[i].proc_id << "\t\t" << processes_input.processes[i].burst_time << "\t\t\t" << processes_input.processes[i].waiting_time << "\t\t\t" << processes_input.processes[i].waiting_time << "\t\t\t" << processes_input.processes[i].turnaround_time << "\n";
-    }
+    //    cout << processes_input.processes[i].proc_id << "\t\t" << processes_input.processes[i].burst_time << "\t\t\t" << processes_input.processes[i].waiting_time << "\t\t\t" << processes_input.processes[i].waiting_time << "\t\t\t" << processes_input.processes[i].turnaround_time << "\n";
+    //}
 
 
 
 
     cout << "the average waiting time for the FCFS algorithm is: \t" << alg_out1.Avg_waiting_time << endl;
     cout << "the average turnaround time for the FCFS algorithm is: \t" << alg_out1.Avg_turnaround_time << endl;
-    cout << "the average tutime for the FCFS algorithm is: \t" << alg_out1.Avg_turnaround_time << endl;
+    cout << "the average response time for the FCFS algorithm is: \t" << alg_out1.Avg_response_time << endl;
 
 
     cout << "the average waiting time for the Preemptive_SJF algorithm is: \t" << alg_out2.Avg_waiting_time << endl;
     cout << "the average turnaround time for the Preemptive_SJF algorithm is: \t" << alg_out2.Avg_turnaround_time << endl;
-    cout << "the average tutime for the Preemptive_SJF algorithm is: \t" << alg_out2.Avg_turnaround_time << endl;
+    cout << "the average response time for the Preemptive_SJF algorithm is: \t" << alg_out2.Avg_response_time << endl;
 
     cout << "the average waiting time for the Non_preemptive_SJF algorithm is: \t" << alg_out3.Avg_waiting_time << endl;
     cout << "the average turnaround time for the Non_preemptive_SJF algorithm is: \t" << alg_out3.Avg_turnaround_time << endl;
-    cout << "the average tutime for the Non_preemptive_SJF algorithm is: \t" << alg_out3.Avg_turnaround_time << endl;
+    cout << "the average response time for the Non_preemptive_SJF algorithm is: \t" << alg_out3.Avg_response_time << endl;
 
-    //cout << "the average waiting time for the round_roubin algorithm is: \t" << alg_out4.Avg_waiting_time << endl;
-    //cout << "the average turnaround time for the round_roubin algorithm is: \t" << alg_out4.Avg_turnaround_time << endl;
-    //cout << "the average tutime for the round_roubin algorithm is: \t" << alg_out4.Avg_turnaround_time << endl;
+    cout << "the average waiting time for the round_roubin algorithm is: \t" << alg_out4.Avg_waiting_time << endl;
+    cout << "the average turnaround time for the round_roubin algorithm is: \t" << alg_out4.Avg_turnaround_time << endl;
+    cout << "the average response time for the round_roubin algorithm is: \t" << alg_out4.Avg_waiting_time << endl;
 
 
 
